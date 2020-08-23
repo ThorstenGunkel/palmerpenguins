@@ -1,2 +1,2 @@
 # palmerpenguins
-Introduction to the palmerpenguins dataset
+Using the palmerpenguins dataset for machine learning (kmeans clustering, ...)
