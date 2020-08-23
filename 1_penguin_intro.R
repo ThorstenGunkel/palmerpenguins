@@ -10,7 +10,11 @@ str(penguins) # glimpse(penguins)
 #the dataset consists of 344 observations and 7 variables.
 #bill length and depth, flipper length and body mass are quantitative = factors
 
-plot(penguins)
+
+penguins_clean <- penguins[complete.cases(penguins),]
+
+
+plot(penguins_clean)
 #create plots for all variables; not that intuitive, but might be good for a first small look at the data
 
 
@@ -18,18 +22,69 @@ plot(penguins)
 #for factors it makes sense to count and show a histogram
 #show a bar plot about how many species etc there are
 
-plot(table(penguins$species))
-barplot(table(penguins$species), ylim = c(0,200))
+barplot(table(penguins_clean$species), ylim = c(0,200)) 
 
 #a nice barplot about the number of each species
-barplot(table(penguins$species),  main = "Penguins - quantity of each species",
+barplot(table(penguins_clean$species),  main = "Penguins - quantity of each species",
         ylim = c(0,210), 
         col=rgb(0.2,0.4,0.6,0.1)
 #        , col = "white")
 )
 
-ggplot(data = penguins, aes( x = species)) + 
+#barplot with ggplot
+ggplot(data = penguins_clean, aes( x = species)) + 
   geom_bar()
 
 
+#graphs on the distribution based on quantitative variable
+
+ggplot(penguins_clean, aes(bill_length_mm, bill_depth_mm, color = species)) + geom_point()
+ggplot(penguins_clean, aes(bill_length_mm, flipper_length_mm, color = species)) + geom_point()
+ggplot(penguins_clean, aes(bill_length_mm, body_mass_g, color = species)) + geom_point()
+
+ggplot(penguins_clean, aes(bill_depth_mm, flipper_length_mm, color = species)) + geom_point()
+ggplot(penguins_clean, aes(bill_depth_mm, body_mass_g, color = species)) + geom_point()
+
+ggplot(penguins_clean, aes(flipper_length_mm, body_mass_g, color = species)) + geom_point()
+
+#bill length and bill depth seem to be a good indicator for different species
+
+
+
+### using kmeans based on https://www.r-bloggers.com/k-means-clustering-in-r/
+set.seed(20)
+
+#We know that there are three species of penguins, therefore kmeans should create 3 clusters
+#nstart tells R to try 20 different starting positions and use the one with the lowest within cluster variation
+penguinsCluster <- kmeans(penguins_clean[, c("bill_length_mm","bill_depth_mm")], 3, nstart = 20)
+
+penguinsCluster$cluster
+table(penguinsCluster$cluster)
+penguins_clean$cluster <- as.factor(penguinsCluster$cluster)
+
+table(penguins_clean$species, penguins_clean$cluster)
+
+
+#show result: size of points and color of points
+ggplot(penguins_clean, aes(bill_length_mm, bill_depth_mm, color = species)) + geom_point()
+ggplot(penguins_clean, aes(bill_length_mm, bill_depth_mm, color = cluster)) + geom_point()
+
+ggplot(penguins_clean, aes(bill_length_mm, bill_depth_mm, 
+                           color = species, shape = cluster)) + geom_point(size = 4) +
+  ggtitle("Penguins by actual species and kmeans clustering") +                #insert title
+  theme(plot.title = element_text(hjust = 0.5))     #center ggplot title
+
+
+#kmeans for the four quantitative variables
+penguinsCluster <- kmeans(penguins_clean[, c("bill_length_mm","bill_depth_mm", "flipper_length_mm", "body_mass_g")], 3, nstart = 20)
+penguins_clean$cluster <- as.factor(penguinsCluster$cluster)
+table(penguins_clean$species, penguins_clean$cluster)
+
+ggplot(penguins_clean, aes(bill_length_mm, bill_depth_mm, 
+                           color = species, shape = cluster)) + geom_point(size = 4) +
+  ggtitle("Penguins by actual species and kmeans clustering") +                #insert title
+  theme(plot.title = element_text(hjust = 0.5))     #center ggplot title
+
+
+#to do: barplot change size of bars (smaller)
      
