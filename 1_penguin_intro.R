@@ -24,11 +24,11 @@ plot(penguins_clean)
 
 barplot(table(penguins_clean$species), ylim = c(0,200)) 
 
-#a nice barplot about the number of each species
+#a nice barplot containing the number of each species
 barplot(table(penguins_clean$species),  main = "Penguins - quantity of each species",
         ylim = c(0,210), 
         col=rgb(0.2,0.4,0.6,0.1)
-#        , col = "white")
+#        col = "white")
 )
 
 #barplot with ggplot
@@ -75,16 +75,36 @@ ggplot(penguins_clean, aes(bill_length_mm, bill_depth_mm,
   theme(plot.title = element_text(hjust = 0.5))     #center ggplot title
 
 
+#kmeans for three quantitative variables
+penguinsCluster3 <- kmeans(penguins_clean[, c("bill_length_mm","bill_depth_mm", "flipper_length_mm")], 3, nstart = 20)
+penguins_clean$cluster3 <- as.factor(penguinsCluster3$cluster)
+table(penguins_clean$species, penguins_clean$cluster3)
+
+
 #kmeans for the four quantitative variables
-penguinsCluster <- kmeans(penguins_clean[, c("bill_length_mm","bill_depth_mm", "flipper_length_mm", "body_mass_g")], 3, nstart = 20)
-penguins_clean$cluster <- as.factor(penguinsCluster$cluster)
-table(penguins_clean$species, penguins_clean$cluster)
+penguinsCluster4 <- kmeans(penguins_clean[, c("bill_length_mm","bill_depth_mm", "flipper_length_mm", "body_mass_g")], 3, nstart = 20)
+penguins_clean$cluster4 <- as.factor(penguinsCluster4$cluster)
+table(penguins_clean$species, penguins_clean$cluster4)
 
 ggplot(penguins_clean, aes(bill_length_mm, bill_depth_mm, 
-                           color = species, shape = cluster)) + geom_point(size = 4) +
+                           color = species, shape = cluster4)) + geom_point(size = 4) +
   ggtitle("Penguins by actual species and kmeans clustering") +                #insert title
   theme(plot.title = element_text(hjust = 0.5))     #center ggplot title
 
 
+
+#3d plot with shiny; using penguin data 3 vriables and color (species) and shape (cluster)
+penguins_clean$species 
+penguins_clean$bill_length_mm
+penguins_clean$bill_depth_mm
+penguins_clean$flipper_length_mm
+penguins_clean$cluster3
+
+
+
+
+
+
 #to do: barplot change size of bars (smaller)
+#to do: PCA or similar to see wether body mass is a good indicator for species
      
